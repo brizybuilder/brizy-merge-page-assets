@@ -16,6 +16,10 @@ class AssetLib extends Asset
      */
     static function instanceFromJsonData($data)
     {
+        if (!is_array($data)) {
+            throw new \Exception('Invalid AssetLib data provided: array expected');
+        }
+
         $assetKeys = array_keys($data);
 
         $allowedKeys = ['name', 'score', 'content', 'pro', 'selectors'];
@@ -64,7 +68,7 @@ class AssetLib extends Asset
     {
         parent::__construct($name, $score, $content, $url, $type, $attrs, $pro);
 
-        $this->selectors = $selectors;
+        $this->selectors = (array)$selectors;
     }
 
     /**
@@ -82,7 +86,7 @@ class AssetLib extends Asset
      */
     public function setSelectors($selectors)
     {
-        $this->selectors = $selectors;
+        $this->selectors = (array)$selectors;
 
         return $this;
     }

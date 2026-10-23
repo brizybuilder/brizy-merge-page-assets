@@ -50,6 +50,10 @@ class Asset
      */
     static function instanceFromJsonData($data)
     {
+        if (!is_array($data)) {
+            throw new \Exception('Invalid Asset data provided: array expected');
+        }
+
         $assetKeys = array_keys($data);
 
         $allowedKeys = ['name', 'score', 'content', 'pro'];

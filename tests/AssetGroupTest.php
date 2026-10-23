@@ -15,7 +15,7 @@ class AssetGroupTest extends TestCase
     {
         self::markTestSkipped('Skipping until we have a valid page3.json');
 
-        $page = json_decode(file_get_contents("./data/page3.json"), true);
+        $page = json_decode(file_get_contents(__DIR__ . '/data/page3.json'), true);
 
         $data = $page['blocks'][0]['assets']['freeStyles'];
         foreach ($page['blocks'] as $block) {
@@ -32,7 +32,7 @@ class AssetGroupTest extends TestCase
 
     public function test_instanceFromJsonData()
     {
-        $page = json_decode(file_get_contents("./tests/data/page.json"), true);
+        $page = json_decode(file_get_contents(__DIR__ . '/data/page.json'), true);
 
         $data = $page['blocks']['freeStyles'];
         $asset = AssetGroup::instanceFromJsonData($data);
@@ -83,8 +83,23 @@ class AssetGroupTest extends TestCase
         $asset = Asset::instanceFromJsonData($data);
     }
 
+    public function test_instanceFromJsonData_nonArray()
+    {
+        $this->expectException(\Exception::class);
 
+        AssetGroup::instanceFromJsonData(null);
+    }
 
+    public function test_instanceFromJsonData_nullMain()
+    {
+        $this->expectException(\Exception::class);
 
+        AssetGroup::instanceFromJsonData(['main' => null, 'generic' => [], 'libsMap' => [], 'libsSelectors' => []]);
+    }
+
+    public function test_nullLibsMapIsNormalizedToArray()
+    {
+        $this->assertSame([], (new AssetGroup(null, [], null))->getLibsMap());
+        $this->assertSame([], (new AssetGroup())->setLibsMap(null)->getLibsMap());
+    }
 }
-

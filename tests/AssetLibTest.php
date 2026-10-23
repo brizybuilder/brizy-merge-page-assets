@@ -79,4 +79,25 @@ class AssetLibTest extends TestCase
 
         $asset = AssetLib::instanceFromJsonData($data);
     }
+
+    public function test_instanceFromJsonData_nonArray()
+    {
+        $this->expectException(\Exception::class);
+
+        AssetLib::instanceFromJsonData(null);
+    }
+
+    public function test_nullSelectorsAreNormalizedToArray()
+    {
+        $data = [
+            "name"      => "lib",
+            "score"     => 30,
+            "content"   => ["type" => "file", "url" => "lib.js"],
+            "pro"       => false,
+            "selectors" => null,
+        ];
+
+        $this->assertSame([], AssetLib::instanceFromJsonData($data)->getSelectors());
+        $this->assertSame([], (new AssetLib())->setSelectors(null)->getSelectors());
+    }
 }

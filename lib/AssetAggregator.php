@@ -82,11 +82,11 @@ class AssetAggregator
         });
 
         usort($freeGroups, function ($a, $b) {
-            return version_compare($b->getVersion(), $a->getVersion());
+            return version_compare((string)$b->getVersion(), (string)$a->getVersion());
         });
 
         usort($proGroups, function ($a, $b) {
-            return version_compare($b->getVersion(), $a->getVersion());
+            return version_compare((string)$b->getVersion(), (string)$a->getVersion());
         });
 
         return [
@@ -194,7 +194,7 @@ class AssetAggregator
 
     private function groupLibs($assets, $libMap, $selectorsFound, $foundLibPositions)
     {
-        if (count($foundLibPositions) != 0) {
+        if (count($foundLibPositions) != 0 && $libMap) {
             // try to find a lib containing all found selectors
             $libsSelectorsFound = array_unique($selectorsFound);
             $libsSelectorsFoundCount = count($libsSelectorsFound);
@@ -263,8 +263,9 @@ class AssetAggregator
                     $fontSets = explode('|', $fontString);
 
                     foreach ($fontSets as $set) {
-                        list($family, $weights) = explode(':', $set);
-                        $weights = explode(',', $weights);
+                        $parts = explode(':', $set);
+                        $family = $parts[0];
+                        $weights = isset($parts[1]) ? explode(',', $parts[1]) : [];
 
                         if (!isset($fonts[$family])) {
                             $fonts[$family] = [];
@@ -297,7 +298,7 @@ class AssetAggregator
         $replaceValue = $replaceRegex($fontQueryValue, $matchTermination);
 
         $sampleFont->setUrl(
-            preg_replace($extractRegex, $replaceValue, $sampleFont->getUrl())
+            preg_replace($extractRegex, $replaceValue, (string)$sampleFont->getUrl())
         );
 
         $assets[] = $sampleFont;
@@ -307,19 +308,21 @@ class AssetAggregator
 
     private function sortAssets($assets)
     {
-        // sort asset list by score
-        usort(
-            $assets,
-            function ($as1, $as2) {
-                if ($as1->getScore() === $as2->getScore()) {
-                    return 0;
-                }
+        // sort asset list by score, keeping the aggregation order for equal scores
+        // (usort is not stable before PHP 8.0)
+        $indexed = [];
+        foreach (array_values($assets) as $i => $asset) {
+            $indexed[] = [$asset->getScore(), $i, $asset];
+        }
 
-                return ($as1->getScore() < $as2->getScore()) ? -1 : 1;
+        usort(
+            $indexed,
+            function ($a, $b) {
+                return [$a[0], $a[1]] <=> [$b[0], $b[1]];
             }
         );
 
-        return $assets;
+        return array_column($indexed, 2);
     }
 
 }

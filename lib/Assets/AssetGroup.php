@@ -46,6 +46,10 @@ class AssetGroup
      */
     static function instanceFromJsonData($data)
     {
+        if (!is_array($data)) {
+            throw new \Exception('Invalid AssetGroup data provided: array expected');
+        }
+
         $assetKeys = array_keys($data);
 
         $allowedKeys = ['main', 'generic', 'libsMap', 'libsSelectors','version'];
@@ -171,7 +175,7 @@ class AssetGroup
     ) {
         $this->main          = $main;
         $this->generic       = $generic;
-        $this->libsMap       = $libsMap;
+        $this->libsMap       = (array)$libsMap;
         $this->libsSelectors = $libsSelectors;
         $this->pageFonts     = $pageFonts;
         $this->pageStyles    = $pageStyles;
@@ -233,7 +237,7 @@ class AssetGroup
      */
     public function setLibsMap($libsMap)
     {
-        $this->libsMap = $libsMap;
+        $this->libsMap = (array)$libsMap;
 
         return $this;
     }

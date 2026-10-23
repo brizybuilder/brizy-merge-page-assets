@@ -112,7 +112,7 @@ class CompiledData
         $attrs     = array_reduce(
             array_keys($rootAttrs),
             function ($carry, $key) use ($rootAttrs) {
-                return $carry.' '.$key.'="'.htmlspecialchars($rootAttrs[$key]).'"';
+                return $carry.' '.$key.'="'.htmlspecialchars($rootAttrs[$key], ENT_COMPAT | ENT_HTML401).'"';
             },
             ''
         );

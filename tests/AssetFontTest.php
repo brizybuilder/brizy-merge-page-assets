@@ -81,4 +81,18 @@ class AssetFontTest extends TestCase
 
         $asset = AssetFont::instanceFromJsonData($data);
     }
+
+    public function test_instanceFromJsonData_nonArray()
+    {
+        $this->expectException(\Exception::class);
+
+        AssetFont::instanceFromJsonData(null);
+    }
+
+    public function test_getContentByType_unknownTypeReturnsEmptyString()
+    {
+        $font = new AssetFont('font', 1, 'content', 'url', '', [], false, 'google-font');
+
+        $this->assertSame('', $font->getContentByType());
+    }
 }

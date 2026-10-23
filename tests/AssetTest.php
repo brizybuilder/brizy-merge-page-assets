@@ -61,4 +61,11 @@ class AssetTest extends TestCase
 
         $asset = Asset::instanceFromJsonData($data);
     }
+
+    public function test_instanceFromJsonData_nonArray()
+    {
+        $this->expectException(\Exception::class);
+
+        Asset::instanceFromJsonData(null);
+    }
 }
